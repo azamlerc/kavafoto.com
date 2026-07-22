@@ -17,7 +17,7 @@ function shoebox_photo_asset_path($path) {
 	global $photo_base_url;
 
 	if ($photo_base_url) return shoebox_join_path($photo_base_url, $path);
-	return $docroot . ltrim($path, '/');
+	return $docroot . 'photos/' . ltrim($path, '/');
 }
 
 function shoebox_parse_php_variable($source, $variable_name) {
@@ -501,15 +501,15 @@ class Photo {
 	}
 
 	function small_path() {
-		return shoebox_photo_asset_path('photos/' . $this->stem . '_small.' . $this->extension);
+		return shoebox_photo_asset_path($this->stem . '_small.' . $this->extension);
 	}
 
 	function medium_path() {
-		return shoebox_photo_asset_path('photos/' . $this->stem . '_medium.' . $this->extension);
+		return shoebox_photo_asset_path($this->stem . '_medium.' . $this->extension);
 	}
 
 	function large_path() {
-		return shoebox_photo_asset_path('photos/' . $this->stem . '_large.' . $this->extension);
+		return shoebox_photo_asset_path($this->stem . '_large.' . $this->extension);
 	}
 
 	function has_large_version() {
