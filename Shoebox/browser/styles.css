@@ -1,0 +1,52 @@
+/* Frames */
+frame { border-style: solid; 
+		border-top-width: 0; 
+		border-bottom-width: 0; 
+		border-left-width: 0; 
+		border-right-width: 0; }
+frame.toolbar { border-bottom-width: 1; }
+frame.results { border-top-width: 1; }
+
+/* Body */
+body { margin: 0px 0px; font: 14px Futura, Verdana, Arial, Helvetica, sans-serif; }
+body.toolbar { margin: 8px 10px; }
+body.results { margin: 0px 0px; 
+	background-repeat: repeat-x; 	
+	background-attachment: fixed; }
+body.index { margin: 10px 10px; 
+	background-repeat: repeat-x; 	
+	background-attachment: fixed; }
+
+/* Table cells */
+table.results { background-image: url("images/logo_background.png"); 
+	background-position: bottom left; 
+	background-repeat: no-repeat; } 
+td { font: 14px Futura, Verdana, Arial, Helvetica, sans-serif; padding : 0px 0px; } 
+td.header,p.header { font: 18px Futura, Verdana, Arial, Helvetica, sans-serif; white-space: nowrap; }
+td.browser { font: 12px 'Lucida Grande', Verdana, Arial, Helvetica, sans-serif;  padding : 0px 0px; } 
+td.selected { font: 12px 'Lucida Grande', Verdana, Arial, Helvetica, sans-serif; }
+
+/* Links */
+a { text-decoration: none; }
+a:hover { }
+a.browser { text-decoration: none; }
+a.browser:hover { text-decoration: none; }
+a.browser:active { text-decoration: none; }
+a.selected { color: white; text-decoration: none; }
+a.selected:hover { color: white; text-decoration: none; }
+a.selected:active { color: white; text-decoration: none; }
+
+/* Link icons */
+a.external { background: url("images/links/external.png") center right no-repeat; padding-right: 20px; }
+a.external[href *="www.google"] { background: url("images/links/google.png") center right no-repeat; }
+a.external[href *="images.google"] { background: url("images/links/google.png") center right no-repeat; }
+a.external[href *="maps.google"] { background: url("images/links/maps.png") center right no-repeat; }
+a.external[href *="wiki"] { background: url("images/links/wiki.gif") center right no-repeat; }
+a.external[href ^="mailto"] { background: url("images/links/mail.png") center right no-repeat; }
+
+/* Images */
+img { border: 0 }
+
+/* Shadow */
+.shadow { padding: 1px 2px 2px 2px; }
+

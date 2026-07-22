@@ -1,0 +1,29 @@
+/* Frames */
+frame { border-top-color: #777777; 
+		border-bottom-color: #777777; 
+		border-left-color: #777777; 
+		border-right-color: #777777; }
+
+/* Body */
+body.toolbar { background-image: url("toolbar.jpg"); }
+body.results,
+body.index { background-image: url("results.jpg"); 
+			   background-color: #d4d4d4; }
+body.browser { background: white; }
+
+/* Table cells */
+td.browser { background: white;  } 
+td.selected { background: #3875D7; color: white; }
+p,td,li { color: #666; } 
+td.header { color: #333;  }
+
+/* Links */
+a { color: #333; }
+a:hover { color: black; }
+a.browser { color: black; }
+a.browser:hover { color: black; }
+a.browser:active { color: black; }
+
+/* Shadow */
+.shadow { background-color: rgba(0, 0, 0, 0.12); }
+

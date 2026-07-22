@@ -1,0 +1,24 @@
+body { 
+	background-image: url('../../images/sabines.png'); 
+	background-repeat: no-repeat; 	
+	background-color: black;
+	font: 14px/1.4em Futura, Verdana; color: white; 
+	margin: 0px 0px; 
+} 
+p, li, td { font: 14px/1.4em Futura, Verdana; color: #777; } 
+
+span.headline { font: 60px Futura, Verdana; color: white; } 
+span.section { font: 40px Futura, Verdana; color: white; } 
+span.sidebar { font: 24px Futura, Verdana; color: white; } 
+
+span.header { color: #888; font: 40px Futura, Verdana; } 
+
+/* Links */
+a { color: white; text-decoration: none; }
+a:hover { color: #BBB; }
+
+img { border: 0 }
+
+/* Shadow */
+.shadow { padding: 1px 2px 2px 2px;  
+		background-color: rgba(255, 255, 255, 0.12); }
