@@ -242,7 +242,7 @@ $info_table .= info_table_row('who', $photo->who);
 $info_table .= info_table_row('what', $photo->what);
 $info_table .= info_table_row('etc', $photo->etc);
 
-$download_image = file_exists($photo->large_path()) ? $photo->large_path() : $photo->medium_path();
+$download_image = $photo->has_large_version() ? $photo->large_path() : $photo->medium_path();
 if ($photo->path) $info_table .= info_table_row('file', hyperlink($download_image, $photo->short_path())); 
 
 $children = $category->children_catids;

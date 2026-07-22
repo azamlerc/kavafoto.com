@@ -182,7 +182,7 @@ if ($path) {
 	$alt_array = array_merge($alt_array, names_for_categories($photo->etc));
 	$alt = implode(', ', $alt_array);
 	
-	$has_large = file_exists($photo->large_path());
+	$has_large = $photo->has_large_version();
 	$image = img($photo->medium_path(), $alt, $photo->medium_width(), $photo->medium_height(), "class=\"shadow\"");
 	if ($has_large) {
 		$image = 

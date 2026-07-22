@@ -15,6 +15,7 @@ $show_bookmark = 1;
 $generator = 'Shoebox (null)';
 $email = 'andrew@zamler-carhart.com';
 $small_size = '160';
+$photo_base_url = 'https://images.andrewzc.net/shoebox/photos/';
 $formatted_time = '11:43 AM';
 $theme = 'dark';
 $results_columns = 5;

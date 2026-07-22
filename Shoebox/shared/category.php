@@ -8,6 +8,52 @@
 
 $docroot = '../';
 
+function shoebox_join_path($base, $path) {
+	return rtrim($base, '/') . '/' . ltrim($path, '/');
+}
+
+function shoebox_photo_asset_path($path) {
+	global $docroot;
+	global $photo_base_url;
+
+	if ($photo_base_url) return shoebox_join_path($photo_base_url, $path);
+	return $docroot . ltrim($path, '/');
+}
+
+function shoebox_parse_php_variable($source, $variable_name) {
+	if (!$source) return null;
+
+	$source = preg_replace('/^\s*<\?(php)?/i', '', $source);
+	$source = preg_replace('/\?>\s*$/', '', $source);
+
+	$scope = array();
+	$scope['__shoebox_source'] = $source;
+	$scope['__shoebox_variable_name'] = $variable_name;
+	eval($scope['__shoebox_source']);
+
+	return isset($$variable_name) ? $$variable_name : null;
+}
+
+function shoebox_folder_info($folder_path) {
+	global $docroot;
+	global $photo_base_url;
+
+	$local_path = $docroot . 'photos/' . $folder_path . 'index.php';
+	if (file_exists($local_path)) {
+		include($local_path);
+		return isset($info) ? $info : null;
+	}
+
+	if ($photo_base_url) {
+		$remote_path = shoebox_join_path($photo_base_url, $folder_path . 'index.php');
+		$source = @file_get_contents($remote_path);
+		$remote_info = shoebox_parse_php_variable($source, 'info');
+		if ($remote_info) return $remote_info;
+	}
+
+	return null;
+}
+
 /**
  * The Category object represents a category. 
  *
@@ -329,14 +375,12 @@ class Photo {
 
 	function info_for_folder($folder_path) {
 		global $all_infos;
-		global $docroot;
 		
 		if (!$all_infos) $all_infos = array();
 		$info = $all_infos[$folder_path];
 		
 		if (!$info) {
-			$folder_info_path = $docroot . 'photos/'. $folder_path . 'index.php';
-			if (file_exists($folder_info_path)) include($folder_info_path);
+			$info = shoebox_folder_info($folder_path);
 			$all_infos[$folder_path] = $info;
 		}
 		
@@ -432,6 +476,7 @@ class Photo {
 
 		$folder_info = Photo::info_for_folder($this->folder);
 		$info = $folder_info[$this->name];
+		if (!$info) $info = array();
 		
 		$this->width = $info['width'];
 		$this->height = $info['height'];
@@ -456,18 +501,21 @@ class Photo {
 	}
 
 	function small_path() {
-		global $docroot;
-		return $docroot . 'photos/'. $this->stem . '_small.' . $this->extension;
+		return shoebox_photo_asset_path('photos/' . $this->stem . '_small.' . $this->extension);
 	}
 
 	function medium_path() {
-		global $docroot;
-		return $docroot . 'photos/'. $this->stem . '_medium.' . $this->extension;
+		return shoebox_photo_asset_path('photos/' . $this->stem . '_medium.' . $this->extension);
 	}
 
 	function large_path() {
-		global $docroot;
-		return $docroot . 'photos/'. $this->stem . '_large.' . $this->extension;
+		return shoebox_photo_asset_path('photos/' . $this->stem . '_large.' . $this->extension);
+	}
+
+	function has_large_version() {
+		global $photo_base_url;
+		if ($photo_base_url) return true;
+		return file_exists($this->large_path());
 	}
 
 	function short_path() {
