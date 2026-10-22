@@ -82,32 +82,32 @@ class Category {
 	
 // class methods
 
-	function root_category() {
+	static function root_category() {
 		return new Category('0000000001');
 	}
 
-	function who_category() {
+	static function who_category() {
 		return new Category('0000000002');
 	}
 
-	function where_category() {
+	static function where_category() {
 		return new Category('0000000003');
 	}
 
-	function what_category() {
+	static function what_category() {
 		return new Category('0000000004');
 	}
 
-	function when_category() {
+	static function when_category() {
 		return new Category('0000000005');
 	}
 
-	function id_for_name($name) {
+	static function id_for_name($name) {
 		global $docroot;
 		include($docroot . "catalog/search.php");
 		$term = strtolower($name);
 		$term = str_replace('_', ' ', $term);
-		$result = $search[$term];
+		$result = $search[$term] ?? null;
 		if (is_array($result)) {
 			$originals = array();
 			foreach($result as $catid) {
@@ -120,13 +120,13 @@ class Category {
 		else return $result;
 	}
 
-	function id_for_date($date) {
+	static function id_for_date($date) {
 		global $docroot;
 		include($docroot . "catalog/dates.php");
-		return $dates[$date];
+		return $dates[$date] ?? null;
 	}
 
-	function ids_for_search($term) {
+	static function ids_for_search($term) {
 		global $docroot;
 		include($docroot . "catalog/search.php");
 		$term = strtolower($term);
@@ -149,25 +149,34 @@ class Category {
 
 // instance methods
 
-	function Category($catid) {
+	function __construct($catid) {
+        $catid = (string) $catid;
+        if (!is_string($catid) || !preg_match('/^\d+(?:-\d+)?$/D', $catid)) {
+            http_response_code(404);
+            exit('Category not found.');
+        }
 		global $docroot;
 		$fileid = substr($catid, strlen($catid) - 1, 1);
 		$path = $docroot . "catalog/categories/$fileid.php";
 		if (file_exists($path)) include ($path);
-		$info = $categories[$catid];
+		$info = $categories[$catid] ?? array();
+        if (!$info) {
+            http_response_code(404);
+            exit('Category not found.');
+        }
 
 		$this->catid = $catid;
-		$this->name = $info['name'];
-		$this->display_name = $info['display_name'];
-		$this->parent_catid = $info['parent'];
-		$this->children_catids = $info['children'];
-		$this->url = $info['url'];
-		$this->comments = $info['comments'];
-		$this->top_rated = $info['top_rated'];
-		$this->alias = $info['alias'];
-		$this->original = $info['original'];
-		$this->favorite = $info['favorite'];
-		$this->photo_count = $info['photo_count'];
+		$this->name = ($info['name'] ?? null);
+		$this->display_name = ($info['display_name'] ?? null);
+		$this->parent_catid = ($info['parent'] ?? null);
+		$this->children_catids = ($info['children'] ?? null);
+		$this->url = ($info['url'] ?? null);
+		$this->comments = ($info['comments'] ?? null);
+		$this->top_rated = ($info['top_rated'] ?? null);
+		$this->alias = ($info['alias'] ?? null);
+		$this->original = ($info['original'] ?? null);
+		$this->favorite = ($info['favorite'] ?? null);
+		$this->photo_count = ($info['photo_count'] ?? null);
 		
 		$this->file_paths = null;
 		
@@ -193,7 +202,7 @@ class Category {
 	}
 	
 	function children() {
-		if ($this->alias == true) {
+		if ($this->alias && $this->original) {
 			$original = new Category($this->original);
 			return $original->children();
 		}
@@ -237,7 +246,7 @@ class Category {
 	}
 	
 	function file_paths() {
-		if ($this->alias == true) {
+		if ($this->alias && $this->original) {
 			$original = new Category($this->original);
 			return $original->file_paths();
 		}
@@ -249,14 +258,14 @@ class Category {
 			// if (strlen($catid) == 10) $fileid = $catid;
 			$path = $docroot . "catalog/memberships/$fileid.php";
 			if ($fileid && file_exists($path)) include ($path);
-			$this->file_paths = $memberships[$catid];
+			$this->file_paths = $memberships[$catid] ?? array();
 		}
 		
 		return $this->file_paths;
 	}
 	
 	function size_image() {
-		if ($this->alias == true) {
+		if ($this->alias && $this->original) {
 			$original = new Category($this->original);
 			return $original->size_image();
 		}
@@ -294,24 +303,23 @@ class Category {
 	}
 	
 	function favorite_photo() {
-		if ($this->alias) {
+		if ($this->alias && $this->original) {
 			$original = new Category($this->original);
 			return $original->favorite_photo();
 		}
 		
 		if ($this->favorite) {
 			return $this->favorite;
-		} else if (isset($this->top_rated)) {
+		} else if (!empty($this->top_rated)) {
 			$key = array_rand($this->top_rated);
 			return $this->top_rated[$key];
 		} else {
-			$key = array_rand($this->file_paths());
-			return $this->file_paths[$key];
+			return $this->random_photo();
 		}
 	}
 
 	function random_photo() {
-		if ($this->alias) {
+		if ($this->alias && $this->original) {
 			$original = new Category($this->original);
 			return $original->random_photo();
 		}
@@ -361,7 +369,7 @@ class Photo {
 	var $when;
 	var $etc;
 	
-	function all_photos() {
+	static function all_photos() {
 		global $all_photos;
 		global $docroot;
 
@@ -373,11 +381,11 @@ class Photo {
 		return $all_photos;
 	}
 
-	function info_for_folder($folder_path) {
+	static function info_for_folder($folder_path) {
 		global $all_infos;
 		
 		if (!$all_infos) $all_infos = array();
-		$info = $all_infos[$folder_path];
+		$info = $all_infos[$folder_path] ?? null;
 		
 		if (!$info) {
 			$info = shoebox_folder_info($folder_path);
@@ -389,10 +397,10 @@ class Photo {
 
 	// returns paths to photos based on the form data
 	// id=catid, category=name, search=search+terms
-	function photos_for_request() {
-		$catid = $_GET['id'];
-		$name = $_GET['category'];
-		$search = $_GET['search'];
+	static function photos_for_request() {
+		$catid = ($_GET['id'] ?? null);
+		$name = ($_GET['category'] ?? null);
+		$search = ($_GET['search'] ?? null);
 
 		if ($name && !$catid) $catid = Category::id_for_name($name);
 		if ($search && !$catid) $catid = Category::id_for_name($search);
@@ -403,11 +411,11 @@ class Photo {
 		} else if ($search) {
 			return Photo::photos_for_search($search);
 		} else {
-			return null;
+			return array();
 		}
 	}
 
-	function name_for_search($search_terms) {
+	static function name_for_search($search_terms) {
 		global $docroot;
 		
 		$terms = explode(' ', $search_terms);
@@ -420,7 +428,7 @@ class Photo {
 		}
 	}
 
-	function photos_for_search($search_terms) {
+	static function photos_for_search($search_terms) {
 		global $docroot;
 		
 		$terms = explode(' ', $search_terms);
@@ -453,7 +461,7 @@ class Photo {
 		return $photos;
 	}
 
-	function photos_for_categories($catids) {
+	static function photos_for_categories($catids) {
 		$photos = array();
 		
 		foreach ($catids as $catid) {
@@ -467,29 +475,35 @@ class Photo {
 
 // instance methods
 
-	function Photo($path) {
+	function __construct($path) {
+        $path = $path ?? '';
+        if (!is_string($path) || str_contains($path, '\\') || str_contains($path, ':') ||
+            preg_match('~(?:^|/)\.\.?(?:/|$)~', $path) || str_starts_with($path, '/')) {
+            http_response_code(404);
+            exit('Photo not found.');
+        }
 		$this->path = $path;
 		$this->name = substr(strrchr($path, '/'), 1);
 		$this->folder = substr($path, 0, strlen($path) - strlen($this->name));
 		$this->extension = substr(strrchr($path, '.'), 1);
 		$this->stem = substr($path, 0, strlen($path) - strlen($this->extension) - 1);
 
-		$folder_info = Photo::info_for_folder($this->folder);
-		$info = $folder_info[$this->name];
+		$folder_info = $path ? Photo::info_for_folder($this->folder) : array();
+		$info = $folder_info[$this->name] ?? array();
 		if (!$info) $info = array();
 		
-		$this->width = $info['width'];
-		$this->height = $info['height'];
+		$this->width = ($info['width'] ?? null);
+		$this->height = ($info['height'] ?? null);
 		$this->aspect_ratio = ($this->height > 0) ? $this->width / $this->height : 1.33333;
 		
-		$this->rating = $info['rating'];
-		$this->comments = $info['comments'];
+		$this->rating = ($info['rating'] ?? null);
+		$this->comments = ($info['comments'] ?? null);
 
-		$this->when = $this->category_array($info['when']);
-		$this->where = $this->category_array($info['where']);
-		$this->who = $this->category_array($info['who']);
-		$this->what = $this->category_array($info['what']);
-		$this->etc = $this->category_array($info['etc']);
+		$this->when = $this->category_array(($info['when'] ?? null));
+		$this->where = $this->category_array(($info['where'] ?? null));
+		$this->who = $this->category_array(($info['who'] ?? null));
+		$this->what = $this->category_array(($info['what'] ?? null));
+		$this->etc = $this->category_array(($info['etc'] ?? null));
 		
 		
 	}
@@ -589,5 +603,5 @@ class Photo {
 }
 
 function stripos_safe($haystack, $needle){
-    return strpos($haystack, stristr($haystack, $needle));
+    return stripos($haystack, $needle);
 }

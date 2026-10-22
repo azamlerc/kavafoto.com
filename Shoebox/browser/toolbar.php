@@ -1,12 +1,13 @@
 <?php
+$category = null; $show_previous = $show_next = false;
 
 include('../catalog/info.php');
 include('../shared/layout.php');
 include('../shared/category.php');
 
-$catid = $_GET['id'];
-$name = $_GET['category'];
-$search = $_GET['search'];
+$catid = ($_GET['id'] ?? null);
+$name = ($_GET['category'] ?? null);
+$search = ($_GET['search'] ?? null);
 
 if ($name && !$catid) $catid = Category::id_for_name($name);
 if ($search && !$catid) $catid = Category::id_for_name($search);
@@ -14,11 +15,11 @@ if ($catid) $category = new Category($catid);
 
 $paths = Photo::photos_for_request();
 
-$page = $_GET['page'];
+$page = ($_GET['page'] ?? null);
 if (!$page) $page = 1;
 $total = 0;
-$number = $_GET['number'];
-$path = $_GET['photo'];
+$number = ($_GET['number'] ?? null);
+$path = ($_GET['photo'] ?? null);
 $show_photo = $number > 0 || $path !== null;
 if ($show_photo) $index = $number - 1;
 

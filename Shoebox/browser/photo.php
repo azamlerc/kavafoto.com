@@ -1,10 +1,11 @@
 <?php
+$arg = $page_arg = '';
 
 include('../catalog/info.php');
 include('../shared/layout.php');
 include('../shared/category.php');
 
-if ($username && $password) {
+if (!empty($username) && !empty($password)) {
 	if ($_SERVER['PHP_AUTH_USER'] != $username || MD5($_SERVER['PHP_AUTH_PW']) != $password) {
 		header('WWW-Authenticate: Basic realm="Shoebox"');
 		header('HTTP/1.0 401 Unauthorized');
@@ -13,13 +14,13 @@ if ($username && $password) {
 	}
 }
 
-$catid = $_GET['id'];
-$name = $_GET['category'];
-$search = $_GET['search'];
+$catid = ($_GET['id'] ?? null);
+$name = ($_GET['category'] ?? null);
+$search = ($_GET['search'] ?? null);
 
-$number = $_GET['number'];
+$number = ($_GET['number'] ?? null);
 $number--; // indexed from one 
-$path = $_GET['photo'];
+$path = ($_GET['photo'] ?? null);
 
 $results_count = $results_columns * $results_rows;
 

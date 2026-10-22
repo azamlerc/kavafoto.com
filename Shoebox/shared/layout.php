@@ -19,9 +19,9 @@ function theme($filename) {
 }
 
 function cookie_monster($key, $default) {
-	$value = $_GET[$key]; // check if a cookie is being set
+	$value = ($_GET[$key] ?? null); // check if a cookie is being set
 	if ($value) setcookie($key, $value); // if so, set the cookie
-	if (!$value) $value = $_COOKIE[$key]; // check if the cookie is already set
+	if (!$value) $value = ($_COOKIE[$key] ?? null); // check if the cookie is already set
 	if (!$value) $value = $default; // otherwise use the default value
 	return $value;
 }
@@ -238,7 +238,7 @@ function popup($path, $windowname, $width, $height, $text, $stuff = '', $hoverte
 
 function page_url() {
 	$url = 'http';
-	if ($_SERVER["HTTPS"] == "on") $url .= "s";
+	if (($_SERVER["HTTPS"] ?? '') == "on") $url .= "s";
  	$url .= "://";
  	if ($_SERVER["SERVER_PORT"] != "80") 
  		$url .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];
@@ -451,7 +451,7 @@ function quicktime_player($source, $width, $autoplay) {
  */
 function scramble_email($string) {
 	$chars = array();
-	$ent = null;
+	$ent = array();
 	
 	$chars = preg_split("//", $string, -1, PREG_SPLIT_NO_EMPTY);	
 	
@@ -466,10 +466,11 @@ function scramble_email($string) {
 
 function unique_name($name) {
 	include('../catalog/search.php');
-	return !is_array($search[strtolower($name)]);
+	return !is_array($search[strtolower($name)] ?? null);
 }
 
 function bookmark($category, $search, $page, $path = null) {
+    $base = $arg = '';
 	$url = page_url();
 	$url = str_replace('zamler-carhart.kavasoft.com', 'www.zamler-carhart.com', $url);
 	$offset = strpos($url, '/browser');

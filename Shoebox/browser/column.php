@@ -6,9 +6,9 @@ include('../catalog/info.php');
 
 head('Shoebox', 'column');
 
-$catid = $_GET['id'];
-$selected_id = $_GET['selected'];
-$column = $_GET['column'];
+$catid = ($_GET['id'] ?? null);
+$selected_id = ($_GET['selected'] ?? null);
+$column = ($_GET['column'] ?? null);
 if (!$column) $column = 0;
 $next_column = $column + 1;
 $cur_frame = "browser$column";

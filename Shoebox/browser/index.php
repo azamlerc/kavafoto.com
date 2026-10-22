@@ -31,7 +31,7 @@ function print_outline($category) {
 	echo("</ul>\n");
 }
 
-$catid = $_GET['id'];
+$catid = ($_GET['id'] ?? null);
 $category = $catid ? new Category($catid) : Category::root_category();
 print_outline($category);
 

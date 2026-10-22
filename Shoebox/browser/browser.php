@@ -5,9 +5,9 @@ include('../shared/category.php');
 
 $columns = array();
 
-$catid = $_GET['id'];
-$name = $_GET['category'];
-$search = $_GET['search'];
+$catid = ($_GET['id'] ?? null);
+$name = ($_GET['category'] ?? null);
+$search = ($_GET['search'] ?? null);
 
 if ($name && !$catid) $catid = Category::id_for_name($name);
 if ($search && !$catid) $catid = Category::id_for_name($search);
@@ -36,7 +36,7 @@ if ($browser_rows < 4) $browser_rows = 8;
 $browser_height = 16 * $browser_rows;
 
 for ($i = 0; $i < $num_columns; $i++) {
-	$rows[] = td('browser', iframe("column.php?column=$i" . $columns[$i], "browser$i", $column_width, "$browser_height", 'auto'));
+	$rows[] = td('browser', iframe("column.php?column=$i" . ($columns[$i] ?? ''), "browser$i", $column_width, "$browser_height", 'auto'));
 }
 
 head('Shoebox', 'browser');

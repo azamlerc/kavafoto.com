@@ -1,10 +1,11 @@
 <?php
+$parent_catid = ''; $count = 0; $category = null; $arg = ''; $show_previous = $show_next = false; $total = 1; $page_offset = 0;
 
 include('../catalog/info.php');
 include('../shared/category.php');
 include('../shared/layout.php');
 
-if ($username && $password) {
+if (!empty($username) && !empty($password)) {
 	if ($_SERVER['PHP_AUTH_USER'] != $username || MD5($_SERVER['PHP_AUTH_PW']) != $password) {
 		header('WWW-Authenticate: Basic realm="Shoebox"');
 		header('HTTP/1.0 401 Unauthorized');
@@ -13,10 +14,10 @@ if ($username && $password) {
 	}
 }
 
-$catid = $_GET['id'];
-$name = $_GET['category'];
-$search = $_GET['search'];
-$page = $_GET['page'];
+$catid = ($_GET['id'] ?? null);
+$name = ($_GET['category'] ?? null);
+$search = ($_GET['search'] ?? null);
+$page = ($_GET['page'] ?? null);
 if (!$page) $page = 1;
 
 $homepage = !$catid && !$name && !$search;
@@ -87,7 +88,7 @@ echo("function updateToolbar() {\n");
 		}
 		else if ($search) $title = $title . ' - ' . ucwords($search);
 		echo("\tparent.document.title=\"$title\";\n");
-		if ($_GET['update'] == 'toolbar') {
+		if (($_GET['update'] ?? null) == 'toolbar') {
 			$encoded_search = str_replace(' ', '+', $search);
 			echo("\tparent.linkbar.location.href=\"toolbar.php?search=$encoded_search\";\n");
 			if ($catid)	
@@ -188,7 +189,7 @@ if ($homepage) {
 	$needed = $results_count - count($home_page) - $random_categories;
 	if ($needed > 0) {
 		$favorites = array_merge($favorites, $searches);
-		$favorites = array_diff($favorites, $home_page);
+		$favorites = array_filter($favorites, function ($favorite) use ($home_page) { return is_array($favorite) || !in_array($favorite, $home_page); });
 		shuffle($favorites);
 		if (count($favorites) > $needed) $favorites = array_slice($favorites, 0, $needed);
 		$home_page = array_merge($home_page, $favorites);
@@ -211,7 +212,7 @@ if ($homepage) {
 			$photo_path = $files[array_rand($files)];
 			$photo = new Photo($photo_path);
 			$name = $favorite['name'];
-			$hovertext = "Search for &ldquo;$term&rdquo;";
+			$hovertext = "Search for &ldquo;$name&rdquo;";
 			$term = strtolower($name);
 			$term = urlencode($term);
 			$link = "javascript:search('$term')";
@@ -234,7 +235,7 @@ if ($homepage) {
 
 	$kavasoft_link = hyperlink('http://www.kavasoft.com/', 'KavaSoft', 'target="external"');
 	$shoebox_link = hyperlink('http://www.kavasoft.com/Shoebox/', 'Shoebox', 'target="external"');
-	$created_by = "Created by $shoebox_link $program_version from $kavasoft_link. $br Published on $formatted_date at $formatted_time. $br $copyright";
+	$created_by = "Created by $shoebox_link {$creator} from $kavasoft_link. $br Published on $formatted_date at $formatted_time. $br $copyright";
 } else {
 	$created_by = "$copyright";
 }

@@ -1,4 +1,5 @@
 <?php
+$filter = '';
 
 include('Shoebox/catalog/info.php');
 include('Shoebox/catalog/favorites.php');
@@ -10,7 +11,7 @@ if ($theme != 'light') $shuffle = 'dark';
 
 $docroot = 'Shoebox/';
 
-$catid = $_GET['id'];
+$catid = ($_GET['id'] ?? null);
 
 shuffle($home_page);
 
@@ -25,13 +26,13 @@ if ($catid) {
 }
 
 $category = new Category($catid);
-$path = $_GET['photo'];
-$link = $_GET['link'];
+$path = ($_GET['photo'] ?? null);
+$link = ($_GET['link'] ?? null);
 if (!$path) $path = $link ? $category->random_photo() : $category->favorite_photo();
 if ($path == $link) $path = $category->random_photo();
 $photo = new Photo($path);
 
-$page = $_GET['page'];
+$page = ($_GET['page'] ?? null);
 $page++;
 
 $next_page = $page + 1;
@@ -203,6 +204,7 @@ echo("</tr></table>");
 
 
 <?php
+$filter = '';
 /*
 echo('<tr>');
 

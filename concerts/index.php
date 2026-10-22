@@ -11,7 +11,7 @@ if ($theme != 'light') $shuffle = 'dark';
 
 $docroot = '../Shoebox/';
 
-$filter = $_GET['filter'];
+$filter = ($_GET['filter'] ?? null);
 
 $totals = array(
 	'year' => array(),
@@ -34,7 +34,7 @@ function add_to_totals($key, $value) {
 	} else if ($value) {
 		$value = str_replace('[', '', $value);
 		$value = str_replace(']', '', $value);
-		$totals[$key][$value] = $totals[$key][$value] + 1;
+		$totals[$key][$value] = ($totals[$key][$value] ?? 0) + 1;
 	}
 }
 
@@ -44,14 +44,14 @@ foreach ($concerts as $concert) {
 	global $filter;
 	
 	if (!$filter || filter_concert_terms($concert, $filter)) { 
-		add_to_totals('year', $concert['year']);
-		add_to_totals('where', $concert['where']);
-		add_to_totals('genre', $concert['genre']);
-		add_to_totals('ensembles', $concert['ensemble']);
-		add_to_totals('composers', $concert['composers']);
-		add_to_totals('performers', $concert['performers']);
-		add_to_totals('name', $concert['name']);
-		add_to_totals('pieces', $concert['pieces']);
+		add_to_totals('year', ($concert['year'] ?? null));
+		add_to_totals('where', ($concert['where'] ?? null));
+		add_to_totals('genre', ($concert['genre'] ?? null));
+		add_to_totals('ensembles', ($concert['ensemble'] ?? null));
+		add_to_totals('composers', ($concert['composers'] ?? null));
+		add_to_totals('performers', ($concert['performers'] ?? null));
+		add_to_totals('name', ($concert['name'] ?? null));
+		add_to_totals('pieces', ($concert['pieces'] ?? null));
 		
 		$displayed_count++;
 	}
@@ -163,7 +163,7 @@ function linkify($text, $catid = null) {
 		return "<a href=\"../category.php?id=$catid\">$text</a>";
 	}
 	
-	$open = strpos($text, '[');
+	$open = strpos($text ?? '', '[');
 	$close = strpos($text, ']');
 	
 	if ($open === false) return $text;
@@ -182,7 +182,7 @@ function arrayify($text, $catid = null) {
 			$output .= linkify($part, $catid) . "<br>";
 		}
 	} else {
-		if (strpos($text, '[') !== false) {
+		if (strpos($text ?? '', '[') !== false) {
 			$output .= linkify($text, $catid);
 		} else if ($catid) {
 			$output = "<a href=\"../category.php?id=$catid\">$text</a>";
@@ -221,14 +221,14 @@ function filter_item_term($item, $term) {
 }
 
 function filter_concert_term($concert, $term) {
-	if (filter_item_term($concert['year'], $term)) return true;
-	if (filter_item_term($concert['name'], $term)) return true;
-	if (filter_item_term($concert['where'], $term)) return true;
-	if (filter_item_term($concert['composers'], $term)) return true;
-	if (filter_item_term($concert['performers'], $term)) return true;
-	if (filter_item_term($concert['ensemble'], $term)) return true;
-	if (filter_item_term($concert['pieces'], $term)) return true;
-	if (filter_item_term($concert['genre'], $term)) return true;
+	if (filter_item_term(($concert['year'] ?? null), $term)) return true;
+	if (filter_item_term(($concert['name'] ?? null), $term)) return true;
+	if (filter_item_term(($concert['where'] ?? null), $term)) return true;
+	if (filter_item_term(($concert['composers'] ?? null), $term)) return true;
+	if (filter_item_term(($concert['performers'] ?? null), $term)) return true;
+	if (filter_item_term(($concert['ensemble'] ?? null), $term)) return true;
+	if (filter_item_term(($concert['pieces'] ?? null), $term)) return true;
+	if (filter_item_term(($concert['genre'] ?? null), $term)) return true;
 	
 	return false;
 }
@@ -251,9 +251,9 @@ if ($phpversion[0] == '5') date_default_timezone_set('Europe/Amsterdam');
 
 $coming_soon_count = 0;
 foreach ($concerts as $i => $concert) {
-	if ($concert['comingsoon']) {
-		$date = date('F j', strtotime(sprintf("%d/%d/%d", $concert['month'], $concert['day'], $concert['year'])));
-		$name = $concert['name'][0];
+	if (($concert['comingsoon'] ?? null)) {
+		$date = date('F j', strtotime(sprintf("%d/%d/%d", ($concert['month'] ?? null), ($concert['day'] ?? null), ($concert['year'] ?? null))));
+		$name = ($concert['name'] ?? null)[0];
 		$info_table = info_table_row($date, $name) . $info_table;
 		$coming_soon_count++;
 	}
@@ -271,13 +271,13 @@ if (!$filter && $coming_soon_count > 0) {
 
 foreach ($concerts as $i => $concert) {
 	
-	$date = sprintf("%d.%d.%d", $concert['day'], $concert['month'], $concert['year']);
-	$date_path = sprintf("%d/%02d/%02d", $concert['year'], $concert['month'], $concert['day']);
+	$date = sprintf("%d.%d.%d", ($concert['day'] ?? null), ($concert['month'] ?? null), ($concert['year'] ?? null));
+	$date_path = sprintf("%d/%02d/%02d", ($concert['year'] ?? null), ($concert['month'] ?? null), ($concert['day'] ?? null));
 	
 	$date_catid = $dates[$date_path];
 	$date_category = new Category($date_catid);
 	$formatted_date = $date_category->display_name();
-	$catid = $concert['id'];
+	$catid = ($concert['id'] ?? null);
 	$category = null;
 	$small_image = null;
 	if ($catid) {
@@ -287,7 +287,7 @@ foreach ($concerts as $i => $concert) {
 		$category = $date_category;
 	}
 	
-	if (!$concert['comingsoon'] && (!$filter || filter_concert_terms($concert, $filter))) {
+	if (!($concert['comingsoon'] ?? null) && (!$filter || filter_concert_terms($concert, $filter))) {
 		$path = $category->random_photo_with_rating(5);
 		$photo = new Photo($path);
 		$name = $category->display_name();
@@ -299,15 +299,15 @@ foreach ($concerts as $i => $concert) {
 		
 		$info_table = "<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\"><tr>";
 		$info_table .= info_table_row('when', "<a href=\"../category.php?id=$date_catid\">$formatted_date</a>");
-		$info_table .= info_table_row('name', arrayify($concert['name'], $catid));
-		$info_table .= info_table_row('where', arrayify($concert['where']));
-		$info_table .= info_table_row('ensemble', arrayify($concert['ensemble']));
-		$info_table .= info_table_row('performers', arrayify($concert['performers']));
-		$info_table .= info_table_row('composers', arrayify($concert['composers']));
-		$info_table .= info_table_row('pieces', arrayify($concert['pieces']));
-		$info_table .= info_table_row('genres', arrayify($concert['genre']));
+		$info_table .= info_table_row('name', arrayify(($concert['name'] ?? null), $catid));
+		$info_table .= info_table_row('where', arrayify(($concert['where'] ?? null)));
+		$info_table .= info_table_row('ensemble', arrayify(($concert['ensemble'] ?? null)));
+		$info_table .= info_table_row('performers', arrayify(($concert['performers'] ?? null)));
+		$info_table .= info_table_row('composers', arrayify(($concert['composers'] ?? null)));
+		$info_table .= info_table_row('pieces', arrayify(($concert['pieces'] ?? null)));
+		$info_table .= info_table_row('genres', arrayify(($concert['genre'] ?? null)));
 		$photo_count = $category->photo_count;
-		$preview = $concert['preview'] ? ' (preview)' : '';
+		$preview = ($concert['preview'] ?? null) ? ' (preview)' : '';
 		if ($photo_count) $info_table .= info_table_row('photos', $photo_count . $preview);
 		$info_table .= "</tr></table>";
 		
@@ -327,7 +327,7 @@ foreach ($concerts as $i => $concert) {
 			$tables = array();
 		}
 	} else {
-		// echo("Skipping: " . $concert['name'] . $br);
+		// echo("Skipping: " . ($concert['name'] ?? null) . $br);
 	}
 }
 

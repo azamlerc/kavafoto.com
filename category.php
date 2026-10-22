@@ -1,4 +1,5 @@
 <?php
+$filter = '';
 
 include('Shoebox/catalog/info.php');
 include('Shoebox/catalog/favorites.php');
@@ -11,9 +12,9 @@ $best = cookie_monster('best', 'off') == 'on';
 
 $docroot = 'Shoebox/';
 
-$catid = $_GET['id'];
+$catid = ($_GET['id'] ?? null);
 if (!$catid) {
-	$search = $_GET['search'];
+	$search = ($_GET['search'] ?? null);
 	if ($search) $catid = Category::id_for_name($search);
 }
 
@@ -32,6 +33,13 @@ if ($best) {
 }
 
 $file_count = count($file_paths);
+if (!$file_count) {
+    http_response_code(404);
+    exit('No photos found.');
+}
+$category = $category ?? null;
+$search = $search ?? '';
+$small1 = $small2 = $small3 = null;
 
 function random_element($array) {
     if (count($array) === 0) return null;
@@ -40,9 +48,9 @@ function random_element($array) {
     return $array[$array_keys[$rand]];
 }
 
-$path = $_GET['photo'];
+$path = ($_GET['photo'] ?? null);
 if ($shuffle) {
-	$link = $_GET['link'];
+	$link = ($_GET['link'] ?? null);
 	if ($category) {
 		if (!$path || array_search($path, $file_paths) === false) 
 			$path = $best ? $category->random_photo_with_rating(5) : $category->random_photo();
@@ -59,7 +67,7 @@ if ($shuffle) {
 $photo = new Photo($path);
 $args = $search ? "search=$search" : "id=$catid";
 
-$page = $_GET['page'];
+$page = ($_GET['page'] ?? null);
 $page++;
 
 $next_page = $page + 1;
@@ -130,8 +138,8 @@ function medium_cell($category, $photo) {
 	global $args;
 	global $shuffle;
 	global $small2;
-	$name = $category->name;
-	$catid = $category->catid;
+	$name = $category?->name ?? ucwords($search ?? '');
+	$catid = $category?->catid;
 	$path = $photo->path;
 	$link = $shuffle ? "category.php?$args&link=$path" : "category.php?$args&photo=$small2";
 	$random = rand(1, 4);
@@ -153,10 +161,10 @@ function small_cell($category, $path = null) {
 	global $used;
 	global $landscape;
 	$category;
-	$catid = $category->catid;
+	$catid = $category?->catid;
 	
 	$photo = new Photo($path);
-	$name = $category->name;
+	$name = $category?->name ?? ucwords($search ?? '');
 	$photo_index = array_search($path, $file_paths);
 	$page = ceil(($photo_index + 1) / $results_count);
 	$link = "category.php?$args&photo=$path";
@@ -209,7 +217,7 @@ function info_table_row($label, $categories) {
 		
 			$link = "category.php?id=$_catid";
 			$row .= hyperlink($link, $category->display_name(), NULL, $category->path());
-			$url = $category->url;
+			$url = $category?->url;
 	
 			if ($url) {
 				$link_type = $category->link_type();
@@ -245,32 +253,32 @@ $info_table .= info_table_row('etc', $photo->etc);
 $download_image = $photo->has_large_version() ? $photo->large_path() : $photo->medium_path();
 if ($photo->path) $info_table .= info_table_row('file', hyperlink($download_image, $photo->short_path())); 
 
-$children = $category->children_catids;
+$children = $category?->children_catids ?? array();
 if ($children) $children = array_diff($children, $photo->when(), $photo->where(), $photo->who(), $photo->what(), $photo->etc());
 
-if (count($children) || $category->url) {
+if (count($children) || $category?->url) {
 	$info_table .= '</table>';
 	echo("<td align=\"center\" valign=\"top\">$info_table</td>");
 	echo("<td width=\"30\">&nbsp;</td>");
 	$info_table = '<table border="0" cellspacing="0" cellpadding="0"><tr>';
 }
  	
-if ($category->url) {
+if ($category?->url) {
 	$link_type = $category->link_type();
 	$link = $link_type;
-	if ($link == 'website') $link = $category->url;
+	if ($link == 'website') $link = $category?->url;
 	if (strpos($link, 'http://') === 0) $link = substr($link, 7);
 	if (strpos($link, 'www.') === 0) $link = substr($link, 4);
 	if ($link[strlen($link) - 1] == '/') $link = substr($link, 0, strlen($link) - 1);
-	$info_table .= info_table_row('link', hyperlink($category->url, $link . ' ' . 
+	$info_table .= info_table_row('link', hyperlink($category?->url, $link . ' ' .
 		img("Shoebox/browser/images/links/$link_type.png", $link_type, 14, 14), 'target="external"'));
 }
 
-if ($category->parent_catid) $info_table .= info_table_row('parent', array($category->parent_catid));
+if ($category?->parent_catid) $info_table .= info_table_row('parent', array($category?->parent_catid));
 
 $child_count = count($children);
 $max_children = 5;
-$show_all = $_GET['showall'];
+$show_all = ($_GET['showall'] ?? null);
 if ($child_count > $max_children && !$show_all) $children = array_slice($children, 0, $max_children - 1);
 $info_table .= info_table_row('&nbsp;&nbsp;&nbsp;children', $children);
 if ($child_count > $max_children && !$show_all)

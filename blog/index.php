@@ -1,4 +1,5 @@
 <?php
+$filter = '';
 
 include('../Shoebox/catalog/info.php');
 include('../Shoebox/catalog/favorites.php');
@@ -52,7 +53,7 @@ echo('</form>');
 echo('</td></tr></table>');
 
 function is_day($day) {
-	return $day[0] == '2' && strlen($day) == 10;
+	return ((string)$day)[0] == '2' && strlen($day) == 10;
 }
 
 $date_keys = array_keys($dates);
@@ -61,7 +62,7 @@ $date_keys = array_filter($date_keys, "is_day");
 $date_keys = array_values($date_keys);
 
 $days_per_page = 5;
-$page = $_GET['page'];
+$page = ($_GET['page'] ?? null);
 if (!$page) $page = 1;
 
 $start = ($page - 1) * $days_per_page;
@@ -95,10 +96,10 @@ function display_total($key, $totals, $max) {
 		}
 	}
 
-	if (count($categories)) echo($key . ": " . implode($categories, ', ') . $br);
+	if (count($categories)) echo($key . ": " . implode(', ', $categories) . $br);
 }
 
-for ($i = $start; $i < $end; $i++) {
+for ($i = $start; $i < min($end, count($date_keys)); $i++) {
 	$date_key = $date_keys[$i];
 	$catid = $dates[$date_key];
 	$category = new Category($catid);

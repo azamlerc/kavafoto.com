@@ -1,8 +1,9 @@
 <?php
+$category = null;
 
 include('catalog/info.php');
 
-if ($username && $password) {
+if (!empty($username) && !empty($password)) {
 	if ($_SERVER['PHP_AUTH_USER'] != $username || MD5($_SERVER['PHP_AUTH_PW']) != $password) {
 		header('WWW-Authenticate: Basic realm="Shoebox"');
 		header('HTTP/1.0 401 Unauthorized');
@@ -17,13 +18,13 @@ include('shared/category.php');
 
 $docroot = '';
 
-$catid = $_GET['id'];
-$name = $_GET['category'];
-$search = $_GET['search'];
-$page = $_GET['page'];
+$catid = ($_GET['id'] ?? null);
+$name = ($_GET['category'] ?? null);
+$search = ($_GET['search'] ?? null);
+$page = ($_GET['page'] ?? null);
 if (!$page) $page = 1;
-$number = $_GET['number'];
-$path = $_GET['photo'];
+$number = ($_GET['number'] ?? null);
+$path = ($_GET['photo'] ?? null);
 $show_photo = $number > 0 || $path !== null;
 if ($show_photo) $index = $number - 1;
 
@@ -37,7 +38,7 @@ if ($category) $title = $title . ' - ' . $category->display_name();
 else if ($search) $title = $title . ' - ' . ucwords($search);
 
 $args = path_with_args('', $_GET);
-$results = $_GET['number'] == null && $_GET['photo'] == null ? 'results.php' : 'photo.php';
+$results = ($_GET['number'] ?? null) == null && ($_GET['photo'] ?? null) == null ? 'results.php' : 'photo.php';
 
 echo("<html>\n");
 echo("<head>\n");

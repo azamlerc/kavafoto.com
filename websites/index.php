@@ -12,8 +12,9 @@ $docroot = '../Shoebox/';
 
 include('websites.php');
 
-$site = $_GET['site'];
-$website = $websites[$site]; 
+$site = ($_GET['site'] ?? null);
+$website = $websites[$site] ?? null;
+if (!$website) { http_response_code(404); exit('Website not found.'); }
 
 $name = $website['name'];
 $url = $website['url'];
@@ -56,7 +57,7 @@ function category_page(catid, page) {
 <table border="0" cellspacing="5" cellpadding="5" width="750"><tr>
 <?php 	
 
-echo("<a name=\"$key\"></a>");
+echo("<a name=\"$site\"></a>");
 echo("<span class=\"section\">$name</span><br><br>");
 echo("<center><a href=\"$url\"><img class=\"shadow\" src=\"images/$site-large.jpg\" width=\"640\"></a></center><br>");
 
